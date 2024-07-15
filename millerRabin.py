@@ -1,70 +1,40 @@
-import random 
+import random
 
-def power(x, y, p):
-	
+def miller_rabin(n, k):
+    if n <= 1:
+        return False
+    if n <= 3:
+        return True
+    if n % 2 == 0:
+        return False
 
-	res = 1; 
-	
-	x = x % p; 
-	while (y > 0):
+    
+    r, d = 0, n - 1
+    while d % 2 == 0:
+        d //= 2
+        r += 1
 
-		if (y & 1):
-			res = (res * x) % p;
+    def is_composite(a):
 
+        x = pow(a, d, n)
+        if x == 1 or x == n - 1:
+            return False
+        for _ in range(r - 1):
+            x = pow(x, 2, n)
+            if x == n - 1:
+                return False
+        return True
 
-		y = y>>1; 
-		x = (x * x) % p;
-	
-	return res;
-
-def miillerTest(d, n):
-	
-
-	a = 2 + random.randint(1, n - 4);
-
-
-	x = power(a, d, n);
-
-	if (x == 1 or x == n - 1):
-		return True;
-
-	
-	while (d != n - 1):
-		x = (x * x) % n;
-		d *= 2;
-
-		if (x == 1):
-			return False;
-		if (x == n - 1):
-			return True;
+    
+    for _ in range(k):
+        a = random.randint(2, n - 2)
+        if is_composite(a):
+            return False
+    
+    return True
 
 
-	return False;
-
-
-def isPrime( n, k):
-	
-	# Corner cases
-	if (n <= 1 or n == 4):
-		return False;
-	if (n <= 3):
-		return True;
-
-	d = n - 1;
-	while (d % 2 == 0):
-		d //= 2;
-
-	for i in range(k):
-		if (miillerTest(d, n) == False):
-			return False;
-
-	return True;
-
-k = 4; 
-
-print("All primes smaller than 100: ");
-for n in range(1,100):
-	if (isPrime(n, k)):
-		print(n , end=" ");
-
-
+n = 561  
+k = 5    
+result = miller_rabin(n, k)
+print(f"{n} is {'probably prime' if result else 'composite'}")
